@@ -59,22 +59,26 @@ while True:
 
             wkshpdb = WorkshopDb()
             # note must create a layout from scratch every time. No reuse
-            layout2 = [[sg.Text(text='Edit Service Id ' + str(values_1['-TABLE-'][0] + 1), justification='center',
-                        font=("Consolas", 15))],
-                    [sg.Text('Service Date'), sg.In(size=(20,1), key='-SVCDATE-'),
-                        sg.CalendarButton('Calendar', target='-SVCDATE-', format='%d-%m-%Y')],
+            layout2 = [[sg.Text('Service Date'), sg.In(size=(20,1), key='-SVCDATE-'),
+                        sg.CalendarButton('calendar', target='-SVCDATE-', format='%d-%m-%Y')],
                     [sg.Text('Car Model'), sg.Combo(('BEZZA 1300 X (AUTO)', 'EXORA 1.6 (A)'), pad=(20,0), size=(20,1)),
-                    sg.Text('Plate No'), sg.Input()],
+                    sg.Text('Plate No'), sg.Input(size=(20,1))],
                     [sg.Text('Workshop'), sg.Combo(wkshpdb.ListWkshpInfoShort(), key='-WKSHP-', pad=(20,10))],
                     [sg.Text('_'*100)],
-                    [sg.Button('Exit')]]
+                    [sg.Text('Mileage', pad=(19,1), justification='left'), sg.Input(size=(20,1)), sg.Text('Next Mileage'), sg.In(size=(20,1))],
+                    [sg.Text('Next Date', pad=(11,1)), sg.Input(size=(20,1), key='-NSVCDATE-'), 
+                    sg.CalendarButton('calendar', target='-NSVCDATE-', format='%d-%m-%Y')],
+                    [sg.Text('_'*100)],
+                    [sg.Text('Labour', pad=(22,1)), sg.Input(size=(20,1)), sg.Text('Amount', pad=(20,0)), sg.Input(size=(20,1))],
+                    [sg.Text(''*100)],
+                    [sg.Text(''*150), sg.Button('Ok'), sg.Button('Cancel')]]
 
-            win_add = sg.Window(title='Edit Service no ' + str(values_1['-TABLE-'][0]+1), size=(800, 600),
+            win_add = sg.Window(title='Edit Service Id: ' + str(values_1['-TABLE-'][0]+1), size=(800, 600),
                                 layout=layout2)
             while True:
                 event_2, values_2 = win_add.Read()
-                print(event_2, values_2)
-                if event_2 is None or event_2 == 'Exit':
+                #print(event_2, values_2)
+                if event_2 is None or event_2 == 'Cancel':
                     win_add.close()
                     win_add_active = False
                     win_svc.UnHide()
