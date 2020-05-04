@@ -222,14 +222,9 @@ class ServiceDb(object):
 
     def list_all_records2(self,):
         # reading the service csv file
-<<<<<<< HEAD
-        df = pd.read_csv(self.dbfilename, index_col=False, header=None)
         #df = df[df["SvcId"] != 0]
-=======
         df = pd.read_csv(self.dbfilename, index_col=False, header=0)
         df = df[df["SvcId"] != 0]
-
->>>>>>> update-service
         # convert column "a" to int64 dtype and "b" to complex type
         df = df.astype({"Mileage": int, "Nxt_Mileage": int, "Labor": float, "Amount": float})
         records = df.values.tolist()
