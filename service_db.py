@@ -132,7 +132,7 @@ class ServiceDb(object):
     	df.at[record_id, 'Labor'] = labour_cost
     	df.at[record_id, 'Amount'] = amount
 
-    	df.to_csv ("service_master.csv", index=True, header=["SvcDate", "Model", "Plate", "Svc_Center","Mileage",
+    	df.to_csv ("service_master.csv", index=True, header=["SvcDate", "Model", "Plate", "Workshop","Mileage",
                         "Nxt_Mileage", "Nxt_Date", "Labor", "Amount"], float_format='%.2f')
        
 
@@ -222,11 +222,11 @@ class ServiceDb(object):
 
     def list_all_records2(self,):
         # reading the service csv file
-        df = pd.read_csv(self.dbfilename, index_col=False, header=None)
-        #df = df[df["SvcId"] != 0]
+        df = pd.read_csv(self.dbfilename, index_col=False, header=0)
+        df = df[df["SvcId"] != 0]
 
         # convert column "a" to int64 dtype and "b" to complex type
-        #df = df.astype({"Mileage": int, "Nxt_Mileage": int, "Amount": float})
+        df = df.astype({"Mileage": int, "Nxt_Mileage": int, "Labor": float, "Amount": float})
         records = df.values.tolist()
         return(records)
 
