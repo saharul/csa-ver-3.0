@@ -44,7 +44,7 @@ layout = [[sg.Table(values=data[2:][:], headings=header_list, max_col_width=25, 
 win_svc = sg.Window('My Car Service History', layout, size=(800,600), resizable=False).Finalize()
 #win_svc.Maximize()
 
-win_add_active=False
+win_edit_active=False
 # ------ Event Loop ------
 while True:
     win_svc.FindElement('-TABLE-').update(select_rows=(0,0))
@@ -52,49 +52,63 @@ while True:
     #print(event, values)
     if event_1 is None or event_1 == 'Exit':
         break
-    if event_1 == 'Edit Record' and not win_add_active:
-        win_add_active = True
+    if event_1 == 'Edit Record' and not win_edit_active:
+        win_edit_active = True
         win_svc.hide()
         
-        try:
+#        try:
 
-            wkshpdb = WorkshopDb()
-            carinfo = CarInfoDb()
-            service = ServiceDb()
-            records = service.get_record(str(values_1['-TABLE-'][0]+1))
+        wkshpdb = WorkshopDb()
+        carinfo = CarInfoDb()
+        service = ServiceDb()
+        rec_id = str(values_1['-TABLE-'][0]+1)
+        records = service.get_record(rec_id)
 
-            # note must create a layout from scratch every time. No reuse
-            layout2 = [[sg.Text('Service No ' + str(values_1['-TABLE-'][0]+1), font=('Any 15'))],
-                        [sg.Text('Service Date'), sg.In(records[1], size=(20,1), key='-SVCDATE-'),
-                        sg.CalendarButton('calendar', target='-SVCDATE-', format='%d/%m/%Y')],
-                    [sg.Text('Car Model'), sg.Combo(carinfo.ListCarInfoShort(), default_value=records[2], pad=(20,0), size=(20,1)),
-                    sg.Text('Plate No'), sg.Input(records[3], size=(20,1))],
-                    [sg.Text('Workshop'), sg.Combo(wkshpdb.ListWkshpInfoShort(), default_value=records[4], key='-WKSHP-', pad=(20,10))],
-                    [sg.Text('_'*100)],
-                    [sg.Text('Mileage', pad=(19,1), justification='left'), sg.Input(records[5], size=(20,1)), sg.Text('Next Mileage'), sg.In(records[6], size=(20,1))],
-                    [sg.Text('Next Date', pad=(11,1)), sg.Input(records[7], size=(20,1), key='-NSVCDATE-'), 
-                    sg.CalendarButton('calendar', target='-NSVCDATE-', format='%d/%m/%Y')],
-                    [sg.Text('_'*100)],
-                    [sg.Text('Labour', pad=(22,1)), sg.Input(records[8], size=(20,1)), sg.Text('Amount', pad=(20,0)), sg.Input(records[9], size=(20,1))],
-                    [sg.Text(''*100)],
-                    [sg.Text(''*150), sg.Button('Update'), sg.Button('Cancel')]]
+        # note must create a layout from scratch every time. No reuse
+        layout2 = [[sg.Text('Service No ' + str(values_1['-TABLE-'][0]+1,), pad=(5,0), font=('Any 11'))],
+                    [sg.Text('-'*150)],
+                    [sg.Text('Service Date'), sg.In(records[1], size=(20,1), key='-SVCDATE-'),
+                    sg.CalendarButton('calendar', target='-SVCDATE-', format='%d/%m/%Y', pad=(0,0))],
+                [sg.Text('Car Model'), sg.Combo(carinfo.ListCarInfoShort(), key='-MODEL-', change_submits=True, default_value=records[2], pad=(20,10), size=(20,1)),
+                sg.Text('Plate No'), sg.Input(records[3], size=(20,10), disabled=True, key='-PLATE-')],
+                [sg.Text('Workshop'), sg.Combo(wkshpdb.ListWkshpInfoShort(), default_value=records[4], key='-WKSHP-', pad=(20,10))],
+                [sg.Text('-'*150)],
+                [sg.Text('Mileage', pad=(19,1), justification='left'), sg.Input(records[5], key='-MILE-', size=(20,1)), sg.Text('Next Mileage'), sg.In(records[6], key='-NXTMILE-', size=(20,1))],
+                [sg.Text('Next Date', pad=(11,1)), sg.Input(records[7], size=(20,1), key='-NSVCDATE-'), 
+                sg.CalendarButton('calendar', target='-NSVCDATE-', format='%d/%m/%Y', pad=(0,0))],
+                [sg.Text('-'*150)],
+                [sg.Text('Labour', pad=(22,1)), sg.Input(records[8], size=(20,1), key='-LAB-'), sg.Text('Amount', pad=(20,0)), sg.Input(records[9], key='-AMT-', size=(20,1))],
+                [sg.Text(''*100)],
+                [sg.Text(''*150), sg.Button('Update'), sg.Button('Cancel')]]
 
-            win_add = sg.Window(title='Edit Service', size=(800, 600),
-                                layout=layout2)
-            while True:
-                event_2, values_2 = win_add.Read()
-                #print(event_2, values_2)
-                if event_2 is None or event_2 == 'Cancel':
-                    win_add.close()
-                    win_add_active = False
-                    win_svc.UnHide()
-                    break
-                elif event_2 == 'Update':
-                    pass
-        except IndexError:
-            win_svc.UnHide()
-            sg.PopupError('Please select a record to edit')
-            win_add_active = False
+        win_edit = sg.Window(title='Edit Service', size=(800, 600),
+                            layout=layout2)
+        while True:
+            event_2, values_2 = win_edit.Read()
+            #print(event_2, values_2)
+            if event_2 is None or event_2 == 'Cancel':
+                win_edit.close()
+                win_edit_active = False
+                win_svc.UnHide()
+                break
+            elif event_2 == 'Update':
+                svc_date = values_2['-SVCDATE-']
+                car_mdel = values_2['-MODEL-']
+                car_mdel_id = carinfo.GetModelId(values_2['-MODEL-'])
+                print('car model id :' + str(car_mdel_id))
+                plate_no = values_2['-PLATE-']
+                wkshp = values_2['-WKSHP-']
+                mileage = values_2['-MILE-']
+                nxtmile = values_2['-NXTMILE-']
+                nsvc_date = values_2['-NSVCDATE-']
+                labour = values_2['-LAB-']
+                amount = values_2['-AMT-']
+                service.update_record(rec_id, svc_date, car_mdel_id, plate_no, wkshp, mileage, nxtmile, nsvc_date, labour, amount)
+                sg.Popup('Service was updated.')
+        # except IndexError:
+        #     win_svc.UnHide()
+        #     sg.PopupError('Please select a record to edit')
+        #     win_edit_active = False
     elif event_1 == 'Delete Record':
         win_svc.FindElement('-TABLE-').update(select_rows=(3-1,4-1,8-7))
         #win_svc['-TABLE-'].update(row_colors=((8, 'white', 'red'), (9, 'green')))
