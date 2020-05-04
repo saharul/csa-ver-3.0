@@ -17,7 +17,8 @@ sg.change_look_and_feel('Light Green 1')
 # ------ Make the Table Data ------
 svc_db = ServiceDb()
 data = svc_db.list_all_records2()
-header_list = data[0:1][0]
+#header_list = data[0:1][0]
+header_list = ("SvcId","SvcDate","Model","Plate","Workshop","Mileage","Nxt_Mileage","Nxt_Date","Labor","Amount")
 # data = df.values.tolist()               
 # read everything else into a list of rows
 # Uses the first row (which should be column names) as columns names
@@ -27,7 +28,7 @@ header_list = data[0:1][0]
 
 
 # ------ Window Layout ------
-layout = [[sg.Table(values=data[2:][:], headings=header_list, max_col_width=25, background_color='lightblue',
+layout = [[sg.Table(values=data[0:][:],headings=header_list, max_col_width=25, background_color='lightblue',
                     auto_size_columns=True,
                     display_row_numbers=False, 
                     justification='left',
@@ -41,7 +42,7 @@ layout = [[sg.Table(values=data[2:][:], headings=header_list, max_col_width=25, 
         #   [sg.Text('Delete Record = Changes the colors of rows 8 and 9')]]
 
 # ------ Create Window ------
-win_svc = sg.Window('My Car Service History', layout, size=(800,600), resizable=False).Finalize()
+win_svc = sg.Window('My Car Service History', layout, size=(1000,600), resizable=False).Finalize()
 #win_svc.Maximize()
 
 win_edit_active=False
@@ -61,7 +62,7 @@ while True:
         wkshpdb = WorkshopDb()
         carinfo = CarInfoDb()
         service = ServiceDb()
-        rec_id = str(values_1['-TABLE-'][0]+1)
+        rec_id = values_1['-TABLE-'][0]+1
         records = service.get_record(rec_id)
 
         # note must create a layout from scratch every time. No reuse
