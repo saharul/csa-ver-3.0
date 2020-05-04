@@ -65,12 +65,12 @@ while True:
             service = ServiceDb()
             rec_id = values_1['-TABLE-'][0]+1
             records = service.get_record(rec_id)
-            # removing decimal point from mileage
-            s = records[5]
-            records[5] = s[:s.index('.')]
-            # removing decimal point from next mileage
-            p = records[6]
-            records[6] = p[:p.index('.')]
+            # # removing decimal point from mileage
+            # s = records[5]
+            # records[5] = s[:s.index('.')]
+            # # removing decimal point from next mileage
+            # p = records[6]
+            # records[6] = p[:p.index('.')]
 
             # note must create a layout from scratch every time. No reuse
             layout2 = [[sg.Text('Service No ' + str(values_1['-TABLE-'][0]+1,), pad=(5,0), font=('Any 11'))],

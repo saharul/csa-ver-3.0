@@ -121,6 +121,7 @@ class ServiceDb(object):
     	ci = CarInfoDb()
     	# reading the contacts csv file
     	df = pd.read_csv(self.dbfilename, index_col="SvcId")
+    	df = df.astype({"Mileage": int, "Nxt_Mileage": int, "Labor": float, "Amount": float})
     	df.at[record_id, 'SvcDate'] = service_date
     	car = ci.GetCarInfoById(car_id)
     	df.at[record_id, 'Model'] = car[1]
