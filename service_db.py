@@ -116,16 +116,16 @@ class ServiceDb(object):
 
 
 
-    def update_record(self, record_id,  service_date = '', car_id = [], plate = '', workshop = '', 
+    def update_record(self, record_id,  service_date = '', car_id = '', plate = '', workshop = '', 
                             mileage = '', nxt_mileage = '', nxt_date = '', labour_cost = '', amount = ''):
     	ci = CarInfoDb()
     	# reading the contacts csv file
     	df = pd.read_csv(self.dbfilename, index_col="SvcId")
     	df.at[record_id, 'SvcDate'] = service_date
-    	car = ci.GetCarInfoById(car_id[0]+1)
+    	car = ci.GetCarInfoById(car_id)
     	df.at[record_id, 'Model'] = car[1]
     	df.at[record_id, 'Plate'] = car[2]
-    	df.at[record_id, 'Svc_Center'] = workshop
+    	df.at[record_id, 'Workshop'] = workshop
     	df.at[record_id, 'Mileage'] = mileage
     	df.at[record_id, 'Nxt_Mileage'] = nxt_mileage
     	df.at[record_id, 'Nxt_Date'] = nxt_date
@@ -223,6 +223,7 @@ class ServiceDb(object):
     def list_all_records2(self,):
         # reading the service csv file
         df = pd.read_csv(self.dbfilename, index_col=False, header=None)
+        #df = df[df["SvcId"] != 0]
         # convert column "a" to int64 dtype and "b" to complex type
         #df = df.astype({"Mileage": int, "Nxt_Mileage": int, "Amount": float})
         records = df.values.tolist()
