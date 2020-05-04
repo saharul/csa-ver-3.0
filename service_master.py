@@ -5,6 +5,7 @@ import random
 import string
 from service_db import ServiceDb
 from workshop_db import WorkshopDb
+from carinfo_db import CarInfoDb
 
 """
     Basic use of the Table Element
@@ -58,22 +59,27 @@ while True:
         try:
 
             wkshpdb = WorkshopDb()
-            # note must create a layout from scratch every time. No reuse
-            layout2 = [[sg.Text('Service Date'), sg.In(size=(20,1), key='-SVCDATE-'),
-                        sg.CalendarButton('calendar', target='-SVCDATE-', format='%d-%m-%Y')],
-                    [sg.Text('Car Model'), sg.Combo(('BEZZA 1300 X (AUTO)', 'EXORA 1.6 (A)'), pad=(20,0), size=(20,1)),
-                    sg.Text('Plate No'), sg.Input(size=(20,1))],
-                    [sg.Text('Workshop'), sg.Combo(wkshpdb.ListWkshpInfoShort(), key='-WKSHP-', pad=(20,10))],
-                    [sg.Text('_'*100)],
-                    [sg.Text('Mileage', pad=(19,1), justification='left'), sg.Input(size=(20,1)), sg.Text('Next Mileage'), sg.In(size=(20,1))],
-                    [sg.Text('Next Date', pad=(11,1)), sg.Input(size=(20,1), key='-NSVCDATE-'), 
-                    sg.CalendarButton('calendar', target='-NSVCDATE-', format='%d-%m-%Y')],
-                    [sg.Text('_'*100)],
-                    [sg.Text('Labour', pad=(22,1)), sg.Input(size=(20,1)), sg.Text('Amount', pad=(20,0)), sg.Input(size=(20,1))],
-                    [sg.Text(''*100)],
-                    [sg.Text(''*150), sg.Button('Ok'), sg.Button('Cancel')]]
+            carinfo = CarInfoDb()
+            service = ServiceDb()
+            records = service.get_record(str(values_1['-TABLE-'][0]+1))
 
-            win_add = sg.Window(title='Edit Service Id: ' + str(values_1['-TABLE-'][0]+1), size=(800, 600),
+            # note must create a layout from scratch every time. No reuse
+            layout2 = [[sg.Text('Service No ' + str(values_1['-TABLE-'][0]+1), font=('Any 15'))],
+                        [sg.Text('Service Date'), sg.In(records[1], size=(20,1), key='-SVCDATE-'),
+                        sg.CalendarButton('calendar', target='-SVCDATE-', format='%d/%m/%Y')],
+                    [sg.Text('Car Model'), sg.Combo(carinfo.ListCarInfoShort(), default_value=records[2], pad=(20,0), size=(20,1)),
+                    sg.Text('Plate No'), sg.Input(records[3], size=(20,1))],
+                    [sg.Text('Workshop'), sg.Combo(wkshpdb.ListWkshpInfoShort(), default_value=records[4], key='-WKSHP-', pad=(20,10))],
+                    [sg.Text('_'*100)],
+                    [sg.Text('Mileage', pad=(19,1), justification='left'), sg.Input(records[5], size=(20,1)), sg.Text('Next Mileage'), sg.In(records[6], size=(20,1))],
+                    [sg.Text('Next Date', pad=(11,1)), sg.Input(records[7], size=(20,1), key='-NSVCDATE-'), 
+                    sg.CalendarButton('calendar', target='-NSVCDATE-', format='%d/%m/%Y')],
+                    [sg.Text('_'*100)],
+                    [sg.Text('Labour', pad=(22,1)), sg.Input(records[8], size=(20,1)), sg.Text('Amount', pad=(20,0)), sg.Input(records[9], size=(20,1))],
+                    [sg.Text(''*100)],
+                    [sg.Text(''*150), sg.Button('Update'), sg.Button('Cancel')]]
+
+            win_add = sg.Window(title='Edit Service', size=(800, 600),
                                 layout=layout2)
             while True:
                 event_2, values_2 = win_add.Read()
@@ -83,6 +89,8 @@ while True:
                     win_add_active = False
                     win_svc.UnHide()
                     break
+                elif event_2 == 'Update':
+                    pass
         except IndexError:
             win_svc.UnHide()
             sg.PopupError('Please select a record to edit')
