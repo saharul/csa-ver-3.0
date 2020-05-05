@@ -9,8 +9,6 @@ def service_layout(data):
     # read everything else into a list of rows
     #header_list = df.iloc[0].tolist()
 
-
-
     # ------ Window Layout ------
     layout = [[sg.Table(values=data[0:][:],headings=header_list, max_col_width=25, background_color='lightblue',
                         auto_size_columns=True,

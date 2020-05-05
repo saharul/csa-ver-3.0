@@ -99,7 +99,6 @@ class ServiceDb(object):
         self.save_part_record(new_record)
 
 
-
     def update_part_record(self, record_id = '', svc_id = '', svc_date = '', part_name = '', qty = '',
                               unit_price = '', discount = '', amount = ''):
     	# reading the contacts csv file
@@ -113,7 +112,6 @@ class ServiceDb(object):
 
     	df.to_csv (self.dbfilename_2, index=True, header=["SvcId","Date", "Name", "Qty", "UnitPrice","Disc", "Amount"], 
                         float_format='%.2f')
-
 
 
     def update_record(self, record_id,  service_date = '', car_id = '', plate = '', workshop = '', 
@@ -148,7 +146,6 @@ class ServiceDb(object):
             f.write(line)
             f.truncate()
       f.close()
-
 
 
     def get_record(self, record_id):
@@ -229,8 +226,10 @@ class ServiceDb(object):
         # convert column "a" to int64 dtype and "b" to complex type
         df = df.astype({"Mileage": int, "Nxt_Mileage": int, "Labor": float, "Amount": float})
         records = df.values.tolist()
+        for rec in records:
+            rec[8] = "{:.2f}".format(rec[8])
+            rec[9] = "{:.2f}".format(rec[9])   
         return(records)
-
 
     def list_all_records(self,):
         records = []

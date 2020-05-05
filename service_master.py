@@ -76,8 +76,9 @@ while True:
             sg.PopupError('Please select a record to edit')
             win_edit_active = False
     elif ev_1 == 'Delete Record':
-        win_svc.FindElement('-TABLE-').update(select_rows=(3-1,4-1,8-7))
-        #win_svc['-TABLE-'].update(row_colors=((8, 'white', 'red'), (9, 'green')))
+        sg.PopupAutoClose('Delete Record')
+    elif ev_1 == 'Add Record':
+        sg.PopupAutoClose('Add Record')
 
 win_svc.close()
 
