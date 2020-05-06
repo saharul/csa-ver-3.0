@@ -28,6 +28,7 @@ win_svc = sg.Window('My Car Service History', layout, size=(1000,600), resizable
 
 win_edit_active=False
 win_add_active=False
+win_part_active=False
 rec_id = 1
 # ------ Event Loop ------
 while True:
@@ -146,6 +147,8 @@ while True:
             sg.PopupAutoClose("Error: %s" % e )            
             win_svc.UnHide()
 
+    elif ev_1 == 'Service Parts' and not win_part_active:
+        data = svc_db.list_all_part_records()
 
 win_svc.close()
 

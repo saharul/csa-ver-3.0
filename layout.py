@@ -18,7 +18,7 @@ def service_layout(data):
                         alternating_row_color='lightyellow',
                         key='-TABLE-',
                         tooltip='This is a table')],
-            [sg.Button('Add Record'), sg.Button('Edit Record'), sg.Button('Delete Record'), sg.Button('Exit')]]
+            [sg.Button('Add Record'), sg.Button('Edit Record'), sg.Button('Delete Record'), sg.Button('Service Parts'), sg.Button('Exit Program')]]
             #   [sg.Text('Add Record = read which rows are selected')],
             #   [sg.Text('Edit Record = double the amount of data in the table')],
             #   [sg.Text('Delete Record = Changes the colors of rows 8 and 9')]]
@@ -61,4 +61,23 @@ def service_layout_edit(mode, records, carinfo, wkshpdb, values_1):
                 [sg.Text(''*100)],
                 [sg.Text(''*150), sg.Button('Ok'), sg.Button('Cancel')]]
 
+    return(layout)
+
+def service_layout_spart(data):
+
+    header_list = ("Id","SvcId","Date","Name","Qty","UnitPrice","Disc","Amount")
+
+    # ------ Window Layout ------
+    layout = [[sg.Table(values=data[0:][:],headings=header_list, max_col_width=25, background_color='lightblue',
+                        auto_size_columns=True,
+                        display_row_numbers=False, 
+                        justification='left',
+                        num_rows=20,
+                        alternating_row_color='lightyellow',
+                        key='-PTABLE-',
+                        tooltip='Service Table')],
+            [sg.Button('Add Record'), sg.Button('Edit Record'), sg.Button('Delete Record'), sg.Button('Exit')]]
+            #   [sg.Text('Add Record = read which rows are selected')],
+            #   [sg.Text('Edit Record = double the amount of data in the table')],
+            #   [sg.Text('Delete Record = Changes the colors of rows 8 and 9')]]
     return(layout)
