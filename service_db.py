@@ -139,11 +139,12 @@ class ServiceDb(object):
       d = f.readlines()
       f.seek(0)
       for line in d:
-         record = line.rstrip()
-         svc_id, svc_date, model, plate, svc_center, mileage, nxt_mileage, nxt_date, labour, amount = line.split(",")
-         if svc_id != record_id:
+         #line = line.rstrip()
+         svc_id = line.split(",") 
+         if svc_id[0] != record_id:
             f.write(line)
             f.truncate()
+
       f.close()
 
 

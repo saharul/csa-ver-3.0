@@ -85,54 +85,66 @@ while True:
             sg.PopupError('Please select a record to edit')
             win_edit_active = False
     elif ev_1 == 'Delete Record':
-        sg.PopupAutoClose('Delete Record')
+        service = ServiceDb()
+        rec_id = val_1['-TABLE-'][0]+1
 
+        butt = sg.PopupYesNo('Are you sure you want to delete record ' + str(rec_id))
+        if butt == "Yes":
+            service.delete_record(str(rec_id))
+            sg.PopupAutoClose("record successfully deleted.")
+            rec_id = 1  # set selected row to first row
+            # refresh table
+            win_svc['-TABLE-'].Update(values=service.list_all_records2())
+
+        else:
+            #sets selected row to value before
+            win_svc['-TABLE-'].update(select_rows=(rec_id,rec_id))
     elif ev_1 == 'Add Record' and not win_add_active:
 
         win_add_active = True
         win_svc.hide()
-#        try:        
+        try:        
 
-        wkshpdb = WorkshopDb()
-        carinfo = CarInfoDb()
-        service = ServiceDb()
-        rec_id = 1
-        records = []
+            wkshpdb = WorkshopDb()
+            carinfo = CarInfoDb()
+            service = ServiceDb()
+            rec_id = 1
+            records = []
 
-        # ------ Get Edit Service Window Layout ------
-        # note must create a layout from scratch every time. No reuse
-        layout3 = service_layout_edit("add", records, carinfo, wkshpdb, val_1)
-        win_add = sg.Window(title='Add New Service', size=(800, 600), layout=layout3)
+            # ------ Get Edit Service Window Layout ------
+            # note must create a layout from scratch every time. No reuse
+            layout3 = service_layout_edit("add", records, carinfo, wkshpdb, val_1)
+            win_add = sg.Window(title='Add New Service', size=(800, 600), layout=layout3)
 
-        while True:
-            ev_3, val_3 = win_add.Read()
-            if ev_3 is None or ev_3 == 'Cancel':
-                win_add.close()
-                win_add_active = False
-                win_svc.UnHide()
-                break
-            elif ev_3 == 'Ok':
-                win_add.close()
-                service.add_record(val_3['-SVCDATE-'], carinfo.GetModelId(val_3['-MODEL-']), 
-                            val_3['-PLATE-'], val_3['-WKSHP-'], val_3['-MILE-'], val_3['-NXTMILE-'], 
-                            val_3['-NSVCDATE-'], val_3['-LAB-'], val_3['-AMT-'])
-                sg.PopupAutoClose('Service Record added successfully')
-                win_svc.UnHide()
-                # refresh table
-                win_svc['-TABLE-'].Update(values=service.list_all_records2())
+            while True:
+                ev_3, val_3 = win_add.Read()
+                if ev_3 is None or ev_3 == 'Cancel':
+                    win_add.close()
+                    win_add_active = False
+                    win_svc.UnHide()
+                    break
+                elif ev_3 == 'Ok':
+                    win_add.close()
+                    service.add_record(val_3['-SVCDATE-'], carinfo.GetModelId(val_3['-MODEL-']), 
+                                val_3['-PLATE-'], val_3['-WKSHP-'], val_3['-MILE-'], val_3['-NXTMILE-'], 
+                                val_3['-NSVCDATE-'], val_3['-LAB-'], val_3['-AMT-'])
+                    sg.PopupAutoClose('Service Record added successfully')
+                    win_svc.UnHide()
+                    # refresh table
+                    win_svc['-TABLE-'].Update(values=service.list_all_records2())
 
-            elif ev_3 == '-MODEL-':
-                car_members = carinfo.ListCarInfo()
-                for c in car_members:
-                    if (c[1] == val_3['-MODEL-']):
-                        break
-                win_add.FindElement('-PLATE-').Update(c[2])
-                win_add.FindElement('-WKSHP-').SetFocus()
+                elif ev_3 == '-MODEL-':
+                    car_members = carinfo.ListCarInfo()
+                    for c in car_members:
+                        if (c[1] == val_3['-MODEL-']):
+                            break
+                    win_add.FindElement('-PLATE-').Update(c[2])
+                    win_add.FindElement('-WKSHP-').SetFocus()
 
-        # except Exception:
-        #     e = sys.exc_info()[0]
-        #     sg.PopupAutoClose("Error: %s" % e )            
-        #     win_svc.UnHide()
+        except Exception:
+            e = sys.exc_info()[0]
+            sg.PopupAutoClose("Error: %s" % e )            
+            win_svc.UnHide()
 
 
 win_svc.close()
