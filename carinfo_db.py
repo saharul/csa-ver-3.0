@@ -99,8 +99,8 @@ class CarInfoDb:
 # main function for running the program        	
 def main():
 	ci = CarInfoDb()
-	print(ci.ListCarInfoShort())
-
+	#print(ci.GetCarInfoById(2))
+	print(ci.GetModelId("EXORA 1.6 (A)"))
 
 if __name__ == "__main__":
      main()

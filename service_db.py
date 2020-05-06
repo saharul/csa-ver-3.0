@@ -44,20 +44,19 @@ class ServiceDb(object):
         f.close()
 
 
-
     # function to add service record to the csv db
     def add_record(self,  service_date = '', car_id = '', plate = '', workshop = '', 
-                        mileage = '', nxt_mileage = '', nxt_date = '', labour_cost = '', amount = ''):
+                        mileage = '', nxt_mileage = '', nxt_date = '', labor = '', amount = ''):
         ci = CarInfoDb()
     	# create a new service id
         record_id = str(self.get_max_id() + 1)
-        car = ci.GetCarInfoById(car_id[0]+1)
+        car = ci.GetCarInfoById(car_id)
         model = car[1]
         plate = car[2]
-        service_center = workshop
-        record = namedtuple("record", "record_id service_date model plate svc_center mileage nxt_mileage nxt_date labour_cost amount")
+        # workshop = workshop
+        record = namedtuple("record", "record_id service_date model plate workshop mileage nxt_mileage nxt_date labor amount")
         new_record = record(record_id, service_date, model, plate, 
-    							service_center, mileage, nxt_mileage, nxt_date, labour_cost, amount)
+    							workshop, mileage, nxt_mileage, nxt_date, labor, amount)
         self.save_record(new_record)
 
 
