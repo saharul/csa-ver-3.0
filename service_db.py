@@ -156,6 +156,14 @@ class ServiceDb(object):
              if (line[0] == str(record_id)):
                 return line
 
+    def get_service_record(self, row_id):
+        
+        # reading the service master csv file
+        records = self.list_all_records2()
+        records = records[row_id]
+
+        return(records)
+
 
 
     def get_record_parts_prev(self, record_id):
@@ -209,14 +217,13 @@ class ServiceDb(object):
         return(records)
 
 
-    def get_one_record_part(self, record_id):
+    def get_one_record_part(self, svc_id, row_id):
         records = []
 
         # reading the service csv file
         df = pd.read_csv("service_parts.csv", index_col=False)
-        df = df[df.Id == int(record_id)]
-        for i in range(0, len(df)):
-            records = df.iloc[i].values.tolist()
+        df = df[df.SvcId == int(svc_id)]
+        records = df.iloc[row_id].values.tolist()
 
         return(records)
 

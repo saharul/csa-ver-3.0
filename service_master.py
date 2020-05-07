@@ -8,6 +8,7 @@ from service_db import ServiceDb
 from workshop_db import WorkshopDb
 from carinfo_db import CarInfoDb
 from layout import service_layout, service_layout_edit, service_layout_spart
+from layout import spart_layout_edit
 
 """
     Screen Car Service Management
@@ -29,10 +30,12 @@ win_svc = sg.Window('My Car Service History', layout, size=(1000,600), resizable
 win_edit_active=False
 win_add_active=False
 win_part_active=False
-rec_id = 1
+row_id = 1
 # ------ Event Loop ------
 while True:
-    win_svc.FindElement('-TABLE-').update(select_rows=(rec_id-1,rec_id-1))
+    if row_id == 0:
+        row_id = 1
+    win_svc.FindElement('-TABLE-').update(select_rows=(row_id-1,row_id-1))
     ev_1, val_1 = win_svc.read()
     #print(event, values)
     if ev_1 is None or ev_1 == 'Exit Program':
@@ -45,8 +48,8 @@ while True:
             wkshpdb = WorkshopDb()
             carinfo = CarInfoDb()
             service = ServiceDb()
-            rec_id = val_1['-TABLE-'][0]+1
-            records = service.get_record(rec_id)
+            row_id = val_1['-TABLE-'][0]+1
+            records = service.get_record(row_id)
 
             # ------ Get Edit Service Window Layout ------
             # note must create a layout from scratch every time. No reuse
@@ -70,7 +73,7 @@ while True:
                     win_edit.FindElement('-WKSHP-').SetFocus()
 
                 elif ev_2 == 'Update':
-                    service.update_record(rec_id, val_2['-SVCDATE-'], carinfo.GetModelId(val_2['-MODEL-']), 
+                    service.update_record(row_id, val_2['-SVCDATE-'], carinfo.GetModelId(val_2['-MODEL-']), 
                                val_2['-PLATE-'], val_2['-WKSHP-'], val_2['-MILE-'], val_2['-NXTMILE-'], 
                                val_2['-NSVCDATE-'], val_2['-LAB-'], val_2['-AMT-'])
                     sg.PopupAutoClose('Service was updated.')
@@ -79,7 +82,7 @@ while True:
                     # refresh table
                     win_svc['-TABLE-'].Update(values=service.list_all_records2())
                     # retain selected row
-                    win_svc['-TABLE-'].update(select_rows=(rec_id-1,rec_id-1))
+                    win_svc['-TABLE-'].update(select_rows=(row_id-1,row_id-1))
                   
         except IndexError:
             win_svc.UnHide()
@@ -146,7 +149,6 @@ while True:
             e = sys.exc_info()[0]
             sg.PopupAutoClose("Error: %s" % e )            
             win_svc.UnHide()
-
     elif ev_1 == 'Service Parts' and not win_part_active:
         win_svc.Hide()
 
@@ -155,29 +157,52 @@ while True:
         wkshpdb = WorkshopDb()
         carinfo = CarInfoDb()
         service = ServiceDb()
-        rec_id = val_1['-TABLE-'][0]+1
-        service_rec = service.get_record(rec_id)        
-        sparts_rec = svc_db.get_record_parts(rec_id)
+        row_id = val_1['-TABLE-'][0]
+        service_rec = service.get_service_record(row_id)
+        svc_id = service_rec[0]
+        sparts_rec = svc_db.get_record_parts(svc_id)
+        win_spart_edit_active = False
 
         if sparts_rec == []:
             sg.PopupAutoClose('No Spare Parts found!')
             win_svc.UnHide()
             continue
 
-        # ------ Get Service Window Layout ------
+        # ------ Get Spare Part Window Layout ------
         layout = service_layout_spart(sparts_rec, service_rec, carinfo, wkshpdb, val_1)
 
         # ------ Create Window ------
         win_spart = sg.Window('Spare Parts Info', layout, size=(700,600), resizable=False).Finalize()
+        row_id = 0
         while True:
-            #win_svc.FindElement('-TABLE-').update(select_rows=(rec_id-1,rec_id-1))
+            win_spart.FindElement('-PTABLE-').update(select_rows=(row_id,row_id))
             ev_4, val_4 = win_spart.read()
             #print(event, values)
             if ev_4 is None or ev_4 == 'Close':
                 win_spart.Close()
                 win_part_active = False
                 win_svc.UnHide()
-                break        
+                break
+            if ev_4 == "Edit Part" and not win_spart_edit_active:
+                row_id = val_4['-PTABLE-'][0]
+                #print('svc_id: ' + str(svc_id), 'row_id ' + str(row_id))
+                sparts_one_rec = svc_db.get_one_record_part(svc_id, row_id)
+                win_spart.Hide()
+                win_spart_edit_active = True
+
+                # ------ Get Spare Part Edit Window Layout ------
+                layout = spart_layout_edit("edit", sparts_one_rec, svc_id)
+
+                # ------ Create the Spare PartEdit Window  ------
+                win_spart_edit = sg.Window('Add/Edit Spare Parts', layout, size=(700,600), resizable=False).Finalize()
+                while True:
+                    ev_5, val_5 = win_spart_edit.Read()
+                    
+                    if ev_5 is None or ev_5 == 'Cancel':
+                        win_spart_edit.Close()
+                        win_spart_edit_active = False
+                        win_spart.UnHide()
+                        break                    
 
 win_svc.close()
 
