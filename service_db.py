@@ -193,8 +193,8 @@ class ServiceDb(object):
         df = pd.read_csv("service_parts.csv", index_col=False)
         df = df[df.SvcId == int(record_id)]
 
-        header = ["Id","SvcId", "Date", "Name", "Qty", "UnitPrice", "Disc", "Amount"]
-        records.append(header)
+        #header = ["Id","SvcId", "Date", "Name", "Qty", "UnitPrice", "Disc", "Amount"]
+        #records.append(header)
         for i in range(0, len(df)):
             a = df.iloc[i].values.tolist()
             a[5] = "{:.2f}".format(float(a[5]))
@@ -217,7 +217,6 @@ class ServiceDb(object):
         return(records)
 
 
-
     def list_all_records2(self,):
         # reading the service csv file
         #df = df[df["SvcId"] != 0]
@@ -230,6 +229,7 @@ class ServiceDb(object):
             rec[8] = "{:.2f}".format(rec[8])
             rec[9] = "{:.2f}".format(rec[9])   
         return(records)
+
 
     def list_all_records(self,):
         records = []
@@ -284,6 +284,15 @@ class ServiceDb(object):
         #     records[i, 7] = "{:.2f}".format(x)
         #     records[i, 6] = "{:.2f}".format(records[i,6])
         # #records = df.to_numpy()
+        return(records)
+
+
+    def list_all_part_records2(self,):
+        records = []
+        # reading the service csv file
+        df = pd.read_csv("service_parts.csv", index_col=False, header=0)
+        records = df.values.tolist()
+        
         return(records)
 
 

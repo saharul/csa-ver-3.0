@@ -25,22 +25,22 @@ def service_layout(data):
     return(layout)
 
 
-def service_layout_edit(mode, records, carinfo, wkshpdb, values_1):
+def service_layout_edit(mode, service_rec, carinfo, wkshpdb, val_1):
     # Edit Service
     if mode == "edit":
-        layout = [[sg.Text('Service No ' + str(values_1['-TABLE-'][0]+1,), pad=(5,0), font=('Any 11'))],
+        layout = [[sg.Text('Service No ' + str(val_1['-TABLE-'][0]+1,), pad=(5,0), font=('Any 11'))],
                     [sg.Text('-'*150)],
-                    [sg.Text('Service Date'), sg.In(records[1], size=(20,1), key='-SVCDATE-'),
+                    [sg.Text('Service Date'), sg.In(service_rec[1], size=(20,1), key='-SVCDATE-'),
                     sg.CalendarButton('calendar', target='-SVCDATE-', format='%d/%m/%Y', pad=(0,0))],
-                [sg.Text('Car Model'), sg.Combo(carinfo.ListCarInfoShort(), key='-MODEL-', change_submits=True, default_value=records[2], pad=(20,10), size=(20,1)),
-                sg.Text('Plate No'), sg.Input(records[3], size=(20,10), disabled=True, key='-PLATE-')],
-                [sg.Text('Workshop'), sg.Combo(wkshpdb.ListWkshpInfoShort(), default_value=records[4], key='-WKSHP-', pad=(20,10))],
+                [sg.Text('Car Model'), sg.Combo(carinfo.ListCarInfoShort(), key='-MODEL-', change_submits=True, default_value=service_rec[2], pad=(20,10), size=(20,1)),
+                sg.Text('Plate No'), sg.Input(service_rec[3], size=(20,10), disabled=True, key='-PLATE-')],
+                [sg.Text('Workshop'), sg.Combo(wkshpdb.ListWkshpInfoShort(), default_value=service_rec[4], key='-WKSHP-', pad=(20,10))],
                 [sg.Text('-'*150)],
-                [sg.Text('Mileage', pad=(19,1), justification='left'), sg.Input(records[5], key='-MILE-', size=(20,1)), sg.Text('Next Mileage'), sg.In(records[6], key='-NXTMILE-', size=(20,1))],
-                [sg.Text('Next Date', pad=(11,1)), sg.Input(records[7], size=(20,1), key='-NSVCDATE-'), 
+                [sg.Text('Mileage', pad=(19,1), justification='left'), sg.Input(service_rec[5], key='-MILE-', size=(20,1)), sg.Text('Next Mileage'), sg.In(service_rec[6], key='-NXTMILE-', size=(20,1))],
+                [sg.Text('Next Date', pad=(11,1)), sg.Input(service_rec[7], size=(20,1), key='-NSVCDATE-'), 
                 sg.CalendarButton('calendar', target='-NSVCDATE-', format='%d/%m/%Y', pad=(0,0))],
                 [sg.Text('-'*150)],
-                [sg.Text('Labour', pad=(22,1)), sg.Input(records[8], size=(20,1), key='-LAB-'), sg.Text('Amount', pad=(20,0)), sg.Input(records[9], key='-AMT-', size=(20,1))],
+                [sg.Text('Labour', pad=(22,1)), sg.Input(service_rec[8], size=(20,1), key='-LAB-'), sg.Text('Amount', pad=(20,0)), sg.Input(service_rec[9], key='-AMT-', size=(20,1))],
                 [sg.Text(''*100)],
                 [sg.Text(''*150), sg.Button('Update'), sg.Button('Cancel')]]
     else:
@@ -63,20 +63,33 @@ def service_layout_edit(mode, records, carinfo, wkshpdb, values_1):
 
     return(layout)
 
-def service_layout_spart(data):
+def service_layout_spart(sparts_rec, service_rec, carinfo, wkshpdb, val_1):
+
 
     header_list = ("Id","SvcId","Date","Name","Qty","UnitPrice","Disc","Amount")
 
     # ------ Window Layout ------
-    layout = [[sg.Table(values=data[0:][:],headings=header_list, max_col_width=25, background_color='lightblue',
-                        auto_size_columns=True,
+    layout = [[sg.Text('Service No ' + str(val_1['-TABLE-'][0]+1,), pad=(5,0), font=('Any 11'))],
+                [sg.Text('-'*150)],
+                [sg.Text('Service Date'), sg.In(service_rec[1], disabled=True, size=(20,1), key='-SVCDATE-')],
+            [sg.Text('Car Model'), sg.Input(service_rec[2], disabled=True, key='-MODEL-', change_submits=True, pad=(20,10), size=(20,1)),
+            sg.Text('Plate No'), sg.Input(service_rec[3], size=(20,10), disabled=True, key='-PLATE-')],
+            [sg.Text('Workshop'), sg.Input(service_rec[4], disabled=True, key='-WKSHP-', pad=(20,10))],
+            [sg.Text('-'*150)],
+            [sg.Text('Mileage', pad=(19,1), justification='left'), sg.Input(service_rec[5], disabled=True, key='-MILE-', size=(20,1)), sg.Text('Next Mileage'), sg.In(service_rec[6], disabled=True, key='-NXTMILE-', size=(20,1))],
+            [sg.Text('Next Date', pad=(11,1)), sg.Input(service_rec[7], size=(20,1), disabled=True, key='-NSVCDATE-')], 
+            [sg.Text('-'*150)],
+            [sg.Text('Labour', pad=(22,1)), sg.Input(service_rec[8], disabled=True, size=(20,1), key='-LAB-'), sg.Text('Amount', pad=(20,0)), sg.Input(service_rec[9], disabled=True, key='-AMT-', size=(20,1))],
+            [sg.Text(''*100)],
+            [sg.Table(values=sparts_rec[0:][:],headings=header_list, max_col_width=25, background_color='lightblue',
+                        auto_size_columns=True, col_widths=10,
                         display_row_numbers=False, 
-                        justification='left',
-                        num_rows=20,
+                        justification='right',
+                        num_rows=15,
                         alternating_row_color='lightyellow',
                         key='-PTABLE-',
                         tooltip='Service Table')],
-            [sg.Button('Add Record'), sg.Button('Edit Record'), sg.Button('Delete Record'), sg.Button('Exit')]]
+            [sg.Button('Add Record'), sg.Button('Edit Record'), sg.Button('Delete Record'), sg.Button('Close')]]
             #   [sg.Text('Add Record = read which rows are selected')],
             #   [sg.Text('Edit Record = double the amount of data in the table')],
             #   [sg.Text('Delete Record = Changes the colors of rows 8 and 9')]]

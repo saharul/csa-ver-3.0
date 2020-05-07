@@ -7,7 +7,7 @@ import string
 from service_db import ServiceDb
 from workshop_db import WorkshopDb
 from carinfo_db import CarInfoDb
-from layout import service_layout, service_layout_edit
+from layout import service_layout, service_layout_edit, service_layout_spart
 
 """
     Screen Car Service Management
@@ -35,7 +35,7 @@ while True:
     win_svc.FindElement('-TABLE-').update(select_rows=(rec_id-1,rec_id-1))
     ev_1, val_1 = win_svc.read()
     #print(event, values)
-    if ev_1 is None or ev_1 == 'Exit':
+    if ev_1 is None or ev_1 == 'Exit Program':
         break
     if ev_1 == 'Edit Record' and not win_edit_active:
         win_edit_active = True
@@ -148,7 +148,36 @@ while True:
             win_svc.UnHide()
 
     elif ev_1 == 'Service Parts' and not win_part_active:
-        data = svc_db.list_all_part_records()
+        win_svc.Hide()
+
+
+        # Initialize classes and variables
+        wkshpdb = WorkshopDb()
+        carinfo = CarInfoDb()
+        service = ServiceDb()
+        rec_id = val_1['-TABLE-'][0]+1
+        service_rec = service.get_record(rec_id)        
+        sparts_rec = svc_db.get_record_parts(rec_id)
+
+        if sparts_rec == []:
+            sg.PopupAutoClose('No Spare Parts found!')
+            win_svc.UnHide()
+            continue
+
+        # ------ Get Service Window Layout ------
+        layout = service_layout_spart(sparts_rec, service_rec, carinfo, wkshpdb, val_1)
+
+        # ------ Create Window ------
+        win_spart = sg.Window('Spare Parts Info', layout, size=(700,600), resizable=False).Finalize()
+        while True:
+            #win_svc.FindElement('-TABLE-').update(select_rows=(rec_id-1,rec_id-1))
+            ev_4, val_4 = win_spart.read()
+            #print(event, values)
+            if ev_4 is None or ev_4 == 'Close':
+                win_spart.Close()
+                win_part_active = False
+                win_svc.UnHide()
+                break        
 
 win_svc.close()
 
