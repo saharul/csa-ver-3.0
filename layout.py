@@ -66,7 +66,15 @@ def service_layout_edit(mode, service_rec, carinfo, wkshpdb, val_1):
 def service_layout_spart(sparts_rec, service_rec, carinfo, wkshpdb, val_1):
 
 
-    header_list = ("Id","SvcId","Date","Name","Qty","UnitPrice","Disc","Amount")
+    header_list = ("PartId","Date","Name","Qty","UnitPrice","Disc","Amount")
+    col = [[sg.Table(values=sparts_rec[0:][:],headings=header_list, max_col_width=20, background_color='lightblue',
+            auto_size_columns=True, col_widths=5,
+            display_row_numbers=False, 
+            justification='right',
+            num_rows=20,
+            alternating_row_color='lightyellow',
+            key='-PTABLE-', hide_vertical_scroll=True,
+            tooltip='Service Table')]]
 
     # ------ Window Layout ------
     layout = [[sg.Text('Service No ' + str(val_1['-TABLE-'][0]+1,), pad=(5,0), font=('Any 11'))],
@@ -80,17 +88,8 @@ def service_layout_spart(sparts_rec, service_rec, carinfo, wkshpdb, val_1):
             [sg.Text('Next Date', pad=(11,1)), sg.Input(service_rec[7], size=(20,1), disabled=True, key='-NSVCDATE-')], 
             [sg.Text('-'*150)],
             [sg.Text('Labour', pad=(22,1)), sg.Input(service_rec[8], disabled=True, size=(20,1), key='-LAB-'), sg.Text('Amount', pad=(20,0)), sg.Input(service_rec[9], disabled=True, key='-AMT-', size=(20,1))],
-            [sg.Text(''*100)],
-            [sg.Table(values=sparts_rec[0:][:],headings=header_list, max_col_width=25, background_color='lightblue',
-                        auto_size_columns=True, col_widths=10,
-                        display_row_numbers=False, 
-                        justification='right',
-                        num_rows=15,
-                        alternating_row_color='lightyellow',
-                        key='-PTABLE-',
-                        tooltip='Service Table')],
+            [sg.Text(''*100)], 
+            [sg.Column(col, scrollable=True, vertical_scroll_only=False, size=(700,200))],
             [sg.Button('Add Record'), sg.Button('Edit Record'), sg.Button('Delete Record'), sg.Button('Close')]]
-            #   [sg.Text('Add Record = read which rows are selected')],
-            #   [sg.Text('Edit Record = double the amount of data in the table')],
-            #   [sg.Text('Delete Record = Changes the colors of rows 8 and 9')]]
+
     return(layout)

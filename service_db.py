@@ -192,14 +192,18 @@ class ServiceDb(object):
         # reading the service csv file
         df = pd.read_csv("service_parts.csv", index_col=False)
         df = df[df.SvcId == int(record_id)]
-
-        #header = ["Id","SvcId", "Date", "Name", "Qty", "UnitPrice", "Disc", "Amount"]
+ 
+         # drop cols SvcId
+        cols_to_drop = ["SvcId"]
+        df = df.drop(cols_to_drop, axis=1)
+ 
+        #header = ["Id", "Date", "Name", "Qty", "UnitPrice", "Disc", "Amount"]
         #records.append(header)
         for i in range(0, len(df)):
             a = df.iloc[i].values.tolist()
+            a[4] = "{:.2f}".format(float(a[4]))
             a[5] = "{:.2f}".format(float(a[5]))
             a[6] = "{:.2f}".format(float(a[6]))
-            a[7] = "{:.2f}".format(float(a[7]))
             # c = b + a
             records.append(a)
         return(records)
