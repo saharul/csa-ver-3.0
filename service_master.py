@@ -20,12 +20,11 @@ sg.change_look_and_feel('Light Green 1')
 svc_db = ServiceDb()
 data = svc_db.list_all_records2()
 
-# ------ Get Service Window Layout ------
+# ------ Get Service Screen Window Layout ------
 layout = service_layout(data)
 
 # ------ Create Window ------
 win_svc = sg.Window('My Car Service History', layout, size=(1000,600), resizable=False).Finalize()
-#win_svc.Maximize()
 
 win_edit_active=False
 win_add_active=False
@@ -33,8 +32,7 @@ win_part_active=False
 row_id = 1
 # ------ Event Loop ------
 while True:
-    if row_id == 0:
-        row_id = 1
+    if row_id == 0: row_id = 1
     win_svc.FindElement('-TABLE-').update(select_rows=(row_id-1,row_id-1))
     ev_1, val_1 = win_svc.read()
     #print(event, values)
@@ -89,12 +87,11 @@ while True:
             sg.PopupError('Please select a record to edit')
             win_edit_active = False
     elif ev_1 == 'Delete Record':
-        service = ServiceDb()
         rec_id = val_1['-TABLE-'][0]+1
 
         butt = sg.PopupYesNo('Are you sure you want to delete record ' + str(rec_id))
         if butt == "Yes":
-            service.delete_record(str(rec_id))
+            svc_db.delete_record(str(rec_id))
             sg.PopupAutoClose("record successfully deleted.")
             rec_id = 1  # set selected row to first row
             # refresh table
@@ -152,21 +149,22 @@ while True:
     elif ev_1 == 'Service Parts' and not win_part_active:
         win_svc.Hide()
 
-
         # Initialize classes and variables
         wkshpdb = WorkshopDb()
         carinfo = CarInfoDb()
-        service = ServiceDb()
+        #service = ServiceDb()
         row_id = val_1['-TABLE-'][0]
-        service_rec = service.get_service_record(row_id)
+        service_rec = svc_db.get_service_record(row_id)
         svc_id = service_rec[0]
         sparts_rec = svc_db.get_record_parts(svc_id)
         win_spart_edit_active = False
+        win_spart_add_active = False
 
-        if sparts_rec == []:
-            sg.PopupAutoClose('No Spare Parts found!')
-            win_svc.UnHide()
-            continue
+        # check if there is empty or no spare part for the service id
+        if sparts_rec == []: sparts_rec = [["", "", "", "", "", "", ""]]
+            # sg.PopupAutoClose('No Spare Parts found!')
+            # win_svc.UnHide()
+            # continue
 
         # ------ Get Spare Part Window Layout ------
         layout = service_layout_spart(sparts_rec, service_rec, carinfo, wkshpdb, val_1)
@@ -183,26 +181,112 @@ while True:
                 win_part_active = False
                 win_svc.UnHide()
                 break
-            if ev_4 == "Edit Part" and not win_spart_edit_active:
+            elif ev_4 == "Edit Part" and not win_spart_edit_active:
+                # if record empty, abort the task.
+                if sparts_rec == [["","","","","","",""]]:
+                    sg.PopupAutoClose('Empty record!')
+                    continue
+
+                try:
+                    row_id = val_4['-PTABLE-'][0]
+                    #print('svc_id: ' + str(svc_id), 'row_id ' + str(row_id))
+                    sparts_one_rec = svc_db.get_one_record_part(svc_id, row_id)
+
+                    # get spare part data
+                    part_data = svc_db.show_parts()
+                    win_spart.Hide()
+                    win_spart_edit_active = True
+
+                    # ------ Get Spare Part Edit Window Layout ------
+                    layout = spart_layout_edit("edit", sparts_one_rec, part_data)
+
+                    # ------ Open the Spare Part Edit Window  ------
+                    win_spart_edit = sg.Window('Edit Spare Parts', layout, size=(700,600), resizable=False).Finalize()
+                    while True:
+                        ev_5, val_5 = win_spart_edit.Read()
+                        
+                        if ev_5 is None or ev_5 == 'Cancel':
+                            win_spart_edit.Close()
+                            win_spart_edit_active = False
+                            win_spart.UnHide()
+                            break
+                        elif ev_5 == 'Update':
+                            win_spart_edit.Close()      # close window spare part edit
+                            win_spart_edit_active = False   # set flag window spare part active = False
+                            # update spare part record
+                            svc_db.update_part_record(int(val_5['-PID-']), val_5['-SID-'], val_5['-SVCDATE-'], val_5['-PNAME-'], 
+                                                val_5['-QTY-'], val_5['-PRICE-'], val_5['-DISC-'], val_5['-AMT-'])
+                            # display popup message 
+                            sg.PopupAutoClose('Spare Part record updated successfully')
+                            # refresh spare part Table
+                            win_spart['-PTABLE-'].Update(values=svc_db.get_record_parts(svc_id))
+                            # show window spare part view
+                            win_spart.UnHide()
+                except Exception:
+                    e = sys.exc_info()[0]
+                    sg.PopupAutoClose("Error: %s" % e )            
+                    win_svc.UnHide()
+            elif ev_4 == "Add Part" and not win_spart_add_active:
+                    win_spart.Hide()
+                    win_spart_add_active = True
+                    sparts_one_rec = [["", svc_id, service_rec[1], "", "", "", ""]]
+                    # get spare part data
+                    part_data = svc_db.show_parts2()
+
+                    # ------ Get Spare Part Edit Window Layout ------
+                    layout = spart_layout_edit("add", sparts_one_rec, part_data)
+
+                    # ------ Open the Spare Part Edit Window  ------
+                    win_spart_add = sg.Window('Add Spare Parts', layout, size=(700,600), resizable=False).Finalize()
+                    while True:
+                        ev_6, val_6 = win_spart_add.Read()
+                        
+                        # user click 'Cancel' button or 'X'
+                        if ev_6 is None or ev_6 == 'Cancel':
+                            # close window spare part add
+                            win_spart_add.Close()
+                            # set flag to false
+                            win_spart_add_active = False
+                            # show again window spare part view
+                            win_spart.UnHide()
+                            break
+                        elif ev_6 == 'Save':
+                            win_spart_add.Close()      # close window spare part edit
+                            win_spart_add_active = False   # set flag window spare part active = False
+                            # save the new spare part record
+                            svc_db.add_part_record(val_6['-SID-'], val_6['-SVCDATE-'], val_6['-PNAME-'], 
+                                                val_6['-QTY-'], val_6['-PRICE-'], val_6['-DISC-'], val_6['-AMT-'])
+
+                            # display popup message 
+                            sg.PopupAutoClose('Spare Part record added successfully')
+                            # refresh spare part Table
+                            win_spart['-PTABLE-'].Update(values=svc_db.get_record_parts(svc_id))
+                            # show window spare part view
+                            win_spart.UnHide()                            
+            elif ev_4 == "Delete Part":
+
+                # if record empty, abort the task.
+                if sparts_rec == [["","","","","","",""]]:
+                    sg.PopupAutoClose('Nothing to delete!')
+                    continue
+
                 row_id = val_4['-PTABLE-'][0]
-                #print('svc_id: ' + str(svc_id), 'row_id ' + str(row_id))
                 sparts_one_rec = svc_db.get_one_record_part(svc_id, row_id)
-                win_spart.Hide()
-                win_spart_edit_active = True
 
-                # ------ Get Spare Part Edit Window Layout ------
-                layout = spart_layout_edit("edit", sparts_one_rec, svc_id)
+                butt = sg.PopupYesNo('Are you sure you want to delete record part id ' + str(sparts_one_rec[0]))
+                if butt == "Yes":
+                    svc_db.delete_part_record(sparts_one_rec[0])
+                    sg.PopupAutoClose("record successfully deleted.")
 
-                # ------ Create the Spare PartEdit Window  ------
-                win_spart_edit = sg.Window('Add/Edit Spare Parts', layout, size=(700,600), resizable=False).Finalize()
-                while True:
-                    ev_5, val_5 = win_spart_edit.Read()
+                    # check if there is empty or no spare part in the window
+                    # after deletion
+                    sparts_rec = svc_db.get_record_parts(svc_id)
+                    if sparts_rec == []: 
+                       sparts_rec = [["", "", "", "", "", "", ""]]  # create empty row.
+                       row_id = 0  # set selected row to first row
                     
-                    if ev_5 is None or ev_5 == 'Cancel':
-                        win_spart_edit.Close()
-                        win_spart_edit_active = False
-                        win_spart.UnHide()
-                        break                    
+                    # refresh table
+                    win_spart['-PTABLE-'].Update(values=sparts_rec)
 
 win_svc.close()
 

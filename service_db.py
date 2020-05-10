@@ -156,6 +156,7 @@ class ServiceDb(object):
              if (line[0] == str(record_id)):
                 return line
 
+
     def get_service_record(self, row_id):
         
         # reading the service master csv file
@@ -163,7 +164,6 @@ class ServiceDb(object):
         records = records[row_id]
 
         return(records)
-
 
 
     def get_record_parts_prev(self, record_id):
@@ -220,11 +220,14 @@ class ServiceDb(object):
     def get_one_record_part(self, svc_id, row_id):
         records = []
 
-        # reading the service csv file
-        df = pd.read_csv("service_parts.csv", index_col=False)
-        df = df[df.SvcId == int(svc_id)]
-        records = df.iloc[row_id].values.tolist()
-
+        try:
+            # reading the service csv file
+            df = pd.read_csv("service_parts.csv", index_col=False)
+            df = df[df.SvcId == int(svc_id)]
+            records = df.iloc[row_id].values.tolist()
+        except IndexError:
+            records = []
+        
         return(records)
 
 
@@ -307,35 +310,49 @@ class ServiceDb(object):
         return(records)
 
 
-    def delete_part_record(self, record_id):
+    def delete_part_record(self, part_id):
 
         # reading the service csv file
-        df = pd.read_csv("service_parts.csv", index_col=False)
+        df = pd.read_csv(self.dbfilename_2, index_col=False)
         # remove the row
-        df1 = df[df.Id != int(record_id)]
+        df1 = df[df.Id != int(part_id)]
 
         # write back the changes to file
-        df1.to_csv ("service_parts.csv", index = False, header=True)
+        df1.to_csv (self.dbfilename_2, index = False, header=True)
+
 
     def show_parts(self):
         df = pd.read_csv(self.dbfilename_2)
         df = df.sort_values(['Name'])
-		
 		# dropping ALL duplicte values 
         df.drop_duplicates(subset ="Name", keep = "first", inplace = True)
-		
 		# reset index to newindex list
         newindex = [''] * len(df)  # set newindex array size
         for i in range(len(df)):
            newindex[i] = i  #set index column
         df.index = newindex
         df.index.name = "Key"
-		
         df = df[["Name"]]
-        
-        records = []
-        for i in range(1, len(df)):
-            b = df.loc[i].values.tolist()
-            records += b
-        return(records)
+
+        return(df.values.tolist())
 			
+
+    def show_parts2(self):
+        df = pd.read_csv("service_parts.csv")
+        df = df.sort_values(['Name'])
+        df.drop_duplicates(subset ="Name", keep = "first", inplace = True)
+        df = df[["Name"]]
+        names = df.values.tolist()
+
+        # set no column
+        no_list = [''] * len(df)  # set newindex array size
+        for i in range(0, len(df)):
+            no_list[i] = i+1  #set index column
+        new_df = pd.DataFrame(columns=['No'], data=no_list)
+        nos = new_df.values.tolist()
+
+        records=[]
+        for i in range(0, len(df)):
+            records.append(nos[i] + names[i])
+        
+        return(records)
