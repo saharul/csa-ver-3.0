@@ -10,7 +10,7 @@ from collections import namedtuple
 
 
 class ServiceDb(object):
-    def __init__(self, filename="service_master.csv", filename_2="service_parts.csv"):
+    def __init__(self, filename="data/service_master.csv", filename_2="data/service_parts.csv"):
         self.dbfilename = filename
         self.dbfilename_2 = filename_2
 
@@ -169,7 +169,7 @@ class ServiceDb(object):
     def get_record_parts_prev(self, record_id):
         records = []
         # reading the service csv file
-        df = pd.read_csv("service_parts.csv", index_col=False)
+        df = pd.read_csv(self.dbfilename_2, index_col=False)
         df = df[df.SvcId == int(record_id)]
 
         # sort dataframe by SvcId and Part Name
@@ -198,7 +198,7 @@ class ServiceDb(object):
     def get_record_parts(self, record_id):
         records = []
         # reading the service csv file
-        df = pd.read_csv("service_parts.csv", index_col=False)
+        df = pd.read_csv(self.dbfilename_2, index_col=False)
         df = df[df.SvcId == int(record_id)]
  
          # drop cols SvcId
@@ -222,7 +222,7 @@ class ServiceDb(object):
 
         try:
             # reading the service csv file
-            df = pd.read_csv("service_parts.csv", index_col=False)
+            df = pd.read_csv(self.dbfilename_2, index_col=False)
             df = df[df.SvcId == int(svc_id)]
             records = df.iloc[row_id].values.tolist()
         except IndexError:
@@ -289,7 +289,7 @@ class ServiceDb(object):
     def list_all_part_records(self,):
         records = []
         # reading the service csv file
-        df = pd.read_csv("service_parts.csv", index_col=False, header=0)
+        df = pd.read_csv(self.dbfilename_2, index_col=False, header=0)
         
         records.append(["SvcId", "Date", "Name", "Qty", "UnitPrice", "Disc", "Amount"])
         for i in range(1, len(df)):
@@ -304,7 +304,7 @@ class ServiceDb(object):
     def list_all_part_records2(self,):
         records = []
         # reading the service csv file
-        df = pd.read_csv("service_parts.csv", index_col=False, header=0)
+        df = pd.read_csv(self.dbfilename_2, index_col=False, header=0)
         records = df.values.tolist()
         
         return(records)
@@ -338,7 +338,7 @@ class ServiceDb(object):
 			
 
     def show_parts2(self):
-        df = pd.read_csv("service_parts.csv")
+        df = pd.read_csv(self.dbfilename_2)
         df = df.sort_values(['Name'])
         df.drop_duplicates(subset ="Name", keep = "first", inplace = True)
         df = df[["Name"]]

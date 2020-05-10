@@ -1,5 +1,5 @@
 __pycache__/
 .ipynb_checkpoints/
 csa-ver-3.0.ipynb
-
-
+*.bak
+data/
