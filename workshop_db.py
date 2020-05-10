@@ -2,7 +2,7 @@ import pandas as pd
 
 
 class WorkshopDb():
-    def __init__(self, filename="workshop_master.csv"):
+    def __init__(self, filename="data/workshop_master.csv"):
         self.dbfilename = filename
 
 

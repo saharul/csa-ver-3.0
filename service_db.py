@@ -87,7 +87,7 @@ class ServiceDb(object):
         df.sort_values(['Id', 'SvcId', 'Name'])
 
         # # Write back new dataframe to csv file
-        df.to_csv (r'service_parts.csv', index = False, header=True)
+        df.to_csv (self.dbfilename_2, index = False, header=True)
    
  
     def add_part_record(self, svc_id = '', svc_date = '', part_name = '', qty = '', unit_price ='',
@@ -130,7 +130,7 @@ class ServiceDb(object):
     	df.at[record_id, 'Labor'] = labour_cost
     	df.at[record_id, 'Amount'] = amount
 
-    	df.to_csv ("service_master.csv", index=True, header=["SvcDate", "Model", "Plate", "Workshop","Mileage",
+    	df.to_csv (self.dbfilename, index=True, header=["SvcDate", "Model", "Plate", "Workshop","Mileage",
                         "Nxt_Mileage", "Nxt_Date", "Labor", "Amount"], float_format='%.2f')
        
 

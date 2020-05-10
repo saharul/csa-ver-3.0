@@ -1,7 +1,7 @@
 import pandas as pd
 
 class CarInfoDb:
-    def __init__(self, filename="carinfo_master.csv"):
+    def __init__(self, filename="data/carinfo_master.csv"):
         self.dbfilename = filename
 
     def GetModelId(self, model):
