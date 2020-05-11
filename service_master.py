@@ -9,6 +9,7 @@ from workshop_db import WorkshopDb
 from carinfo_db import CarInfoDb
 from layout import service_layout, service_layout_edit, service_layout_spart
 from layout import spart_layout_edit
+from validation import is_valid_number, is_field_empty, is_valid_float
 
 """
     Screen Car Service Management
@@ -35,7 +36,7 @@ while True:
     if row_id == 0: row_id = 1
     win_svc.FindElement('-TABLE-').update(select_rows=(row_id-1,row_id-1))
     ev_1, val_1 = win_svc.read()
-    #print(event, values)
+    #print(event, val_3)
     if ev_1 is None or ev_1 == 'Exit Program':
         break
     if ev_1 == 'Edit Record' and not win_edit_active:
@@ -78,7 +79,7 @@ while True:
                     win_edit.Close()
                     win_svc.UnHide()
                     # refresh table
-                    win_svc['-TABLE-'].Update(values=service.list_all_records2())
+                    win_svc['-TABLE-'].Update(val_3=service.list_all_records2())
                     # retain selected row
                     win_svc['-TABLE-'].update(select_rows=(row_id-1,row_id-1))
                   
@@ -95,7 +96,7 @@ while True:
             sg.PopupAutoClose("record successfully deleted.")
             rec_id = 1  # set selected row to first row
             # refresh table
-            win_svc['-TABLE-'].Update(values=service.list_all_records2())
+            win_svc['-TABLE-'].Update(val_3=service.list_all_records2())
 
         else:
             #sets selected row to value before
@@ -115,16 +116,35 @@ while True:
             # ------ Get Edit Service Window Layout ------
             # note must create a layout from scratch every time. No reuse
             layout3 = service_layout_edit("add", records, carinfo, wkshpdb, val_1)
+
             win_add = sg.Window(title='Add New Service', size=(800, 600), layout=layout3)
 
             while True:
                 ev_3, val_3 = win_add.Read()
+
                 if ev_3 is None or ev_3 == 'Cancel':
                     win_add.close()
                     win_add_active = False
                     win_svc.UnHide()
                     break
+
+                # prevent user from entering invalid number
+                elif not is_valid_number(([val_3['-MILE-'], win_add['-MILE-']], 
+                                        [val_3['-NXTMILE-'], win_add['-NXTMILE-']])): continue
+                # prevent user from entering invalid float
+                elif not is_valid_float(([val_3['-LAB-'], win_add['-LAB-']], 
+                                        [val_3['-AMT-'], win_add['-AMT-']])): continue
+                # user click button Ok
                 elif ev_3 == 'Ok':
+
+                    # check for empty field
+                    if is_field_empty(([val_3['-SVCDATE-'], "Service Date"], [val_3['-MODEL-'], "Car Model"], 
+                                        [val_3['-PLATE-'], "Plate No"], [val_3['-WKSHP-'], "Workshop"], 
+                                        [val_3['-MILE-'], "Mileage"], [val_3['-NXTMILE-'], "Next Mileage"], 
+                                        [val_3['-NSVCDATE-'], "Next Date"], [val_3['-LAB-'], "Labor Cost"], 
+                                        [val_3['-AMT-'], "Amount"])): continue
+
+
                     win_add.close()
                     service.add_record(val_3['-SVCDATE-'], carinfo.GetModelId(val_3['-MODEL-']), 
                                 val_3['-PLATE-'], val_3['-WKSHP-'], val_3['-MILE-'], val_3['-NXTMILE-'], 
@@ -141,11 +161,12 @@ while True:
                             break
                     win_add.FindElement('-PLATE-').Update(c[2])
                     win_add.FindElement('-WKSHP-').SetFocus()
-
+            
         except Exception:
             e = sys.exc_info()[0]
             sg.PopupAutoClose("Error: %s" % e )            
             win_svc.UnHide()
+
     elif ev_1 == 'Service Parts' and not win_part_active:
         win_svc.Hide()
 
@@ -175,7 +196,7 @@ while True:
         while True:
             win_spart.FindElement('-PTABLE-').update(select_rows=(row_id,row_id))
             ev_4, val_4 = win_spart.read()
-            #print(event, values)
+            #print(event, val_3)
             if ev_4 is None or ev_4 == 'Close':
                 win_spart.Close()
                 win_part_active = False
@@ -219,7 +240,7 @@ while True:
                             # display popup message 
                             sg.PopupAutoClose('Spare Part record updated successfully')
                             # refresh spare part Table
-                            win_spart['-PTABLE-'].Update(values=svc_db.get_record_parts(svc_id))
+                            win_spart['-PTABLE-'].Update(val_3=svc_db.get_record_parts(svc_id))
                             # show window spare part view
                             win_spart.UnHide()
                 except Exception:
@@ -260,7 +281,7 @@ while True:
                             # display popup message 
                             sg.PopupAutoClose('Spare Part record added successfully')
                             # refresh spare part Table
-                            win_spart['-PTABLE-'].Update(values=svc_db.get_record_parts(svc_id))
+                            win_spart['-PTABLE-'].Update(val_3=svc_db.get_record_parts(svc_id))
                             # show window spare part view
                             win_spart.UnHide()                            
             elif ev_4 == "Delete Part":
@@ -286,7 +307,7 @@ while True:
                        row_id = 0  # set selected row to first row
                     
                     # refresh table
-                    win_spart['-PTABLE-'].Update(values=sparts_rec)
+                    win_spart['-PTABLE-'].Update(val_3=sparts_rec)
 
 win_svc.close()
 
