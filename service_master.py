@@ -63,6 +63,13 @@ while True:
                     win_edit_active = False
                     win_svc.UnHide()
                     break
+                # prevent user from entering invalid number
+                elif not is_valid_number(([val_2['-MILE-'], win_edit['-MILE-']], 
+                                        [val_2['-NXTMILE-'], win_edit['-NXTMILE-']])): continue
+                # prevent user from entering invalid float
+                elif not is_valid_float(([val_2['-LAB-'], win_edit['-LAB-']], 
+                                        [val_2['-AMT-'], win_edit['-AMT-']])): continue
+                 
                 elif ev_2 == '-MODEL-':
                     car_members = carinfo.ListCarInfo()
                     for c in car_members:
@@ -72,6 +79,15 @@ while True:
                     win_edit.FindElement('-WKSHP-').SetFocus()
 
                 elif ev_2 == 'Update':
+
+                    # check for empty field
+                    if is_field_empty(([val_2['-SVCDATE-'], "Service Date"], [val_2['-MODEL-'], "Car Model"], 
+                                        [val_2['-PLATE-'], "Plate No"], [val_2['-WKSHP-'], "Workshop"], 
+                                        [val_2['-MILE-'], "Mileage"], [val_2['-NXTMILE-'], "Next Mileage"], 
+                                        [val_2['-NSVCDATE-'], "Next Date"], [val_2['-LAB-'], "Labor Cost"], 
+                                        [val_2['-AMT-'], "Amount"])): continue
+
+
                     service.update_record(row_id, val_2['-SVCDATE-'], carinfo.GetModelId(val_2['-MODEL-']), 
                                val_2['-PLATE-'], val_2['-WKSHP-'], val_2['-MILE-'], val_2['-NXTMILE-'], 
                                val_2['-NSVCDATE-'], val_2['-LAB-'], val_2['-AMT-'])
@@ -79,7 +95,7 @@ while True:
                     win_edit.Close()
                     win_svc.UnHide()
                     # refresh table
-                    win_svc['-TABLE-'].Update(val_3=service.list_all_records2())
+                    win_svc['-TABLE-'].Update(values=service.list_all_records2())
                     # retain selected row
                     win_svc['-TABLE-'].update(select_rows=(row_id-1,row_id-1))
                   

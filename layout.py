@@ -36,11 +36,11 @@ def service_layout_edit(mode, service_rec, carinfo, wkshpdb, val_1):
                 sg.Text('Plate No'), sg.Input(service_rec[3], size=(20,10), disabled=True, key='-PLATE-')],
                 [sg.Text('Workshop'), sg.Combo(wkshpdb.ListWkshpInfoShort(), default_value=service_rec[4], key='-WKSHP-', pad=(20,10))],
                 [sg.Text('-'*150)],
-                [sg.Text('Mileage', pad=(19,1), justification='left'), sg.Input(service_rec[5], enable_events=True, key='-MILE-', size=(20,1)), sg.Text('Next Mileage'), sg.In(service_rec[6], key='-NXTMILE-', size=(20,1))],
-                [sg.Text('Next Date', pad=(11,1)), sg.Input(service_rec[7], size=(20,1), disabled=True, key='-NSVCDATE-'), 
+                [sg.Text('Mileage', pad=(19,1), justification='left'), sg.Input(service_rec[5], enable_events=True, key='-MILE-', size=(20,1)), sg.Text('Next Mileage'), sg.In(service_rec[6], enable_events=True, key='-NXTMILE-', size=(20,1))],
+                [sg.Text('Next Date', pad=(11,1)), sg.Input(service_rec[7], disabled=True, size=(20,1), key='-NSVCDATE-'), 
                 sg.CalendarButton('calendar', target='-NSVCDATE-', format='%d/%m/%Y', pad=(0,0))],
                 [sg.Text('-'*150)],
-                [sg.Text('Labour', pad=(22,1)), sg.Input(service_rec[8], size=(20,1), key='-LAB-'), sg.Text('Amount', pad=(20,0)), sg.Input(service_rec[9], key='-AMT-', size=(20,1))],
+                [sg.Text('Labour', pad=(22,1)), sg.Input(service_rec[8], enable_events=True, size=(20,1), key='-LAB-'), sg.Text('Amount', pad=(20,0)), sg.Input(service_rec[9], enable_events=True, key='-AMT-', size=(20,1))],
                 [sg.Text(''*100)],
                 [sg.Text(''*150), sg.Button('Update'), sg.Button('Cancel')]]
     else:
