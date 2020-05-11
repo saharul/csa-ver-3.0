@@ -224,45 +224,60 @@ while True:
                     sg.PopupAutoClose('Empty record!')
                     continue
 
-                try:
-                    row_id = val_4['-PTABLE-'][0]
-                    #print('svc_id: ' + str(svc_id), 'row_id ' + str(row_id))
-                    sparts_one_rec = svc_db.get_one_record_part(svc_id, row_id)
+                # try:
+                row_id = val_4['-PTABLE-'][0]
+                #print('svc_id: ' + str(svc_id), 'row_id ' + str(row_id))
+                sparts_one_rec = svc_db.get_one_record_part(svc_id, row_id)
 
-                    # get spare part data
-                    part_data = svc_db.show_parts()
-                    win_spart.Hide()
-                    win_spart_edit_active = True
+                # get spare part data
+                part_data = svc_db.show_parts()
+                win_spart.Hide()
+                win_spart_edit_active = True
 
-                    # ------ Get Spare Part Edit Window Layout ------
-                    layout = spart_layout_edit("edit", sparts_one_rec, part_data)
+                # ------ Get Spare Part Edit Window Layout ------
+                layout = spart_layout_edit("edit", sparts_one_rec, part_data)
 
-                    # ------ Open the Spare Part Edit Window  ------
-                    win_spart_edit = sg.Window('Edit Spare Parts', layout, size=(700,600), resizable=False).Finalize()
-                    while True:
-                        ev_5, val_5 = win_spart_edit.Read()
-                        
-                        if ev_5 is None or ev_5 == 'Cancel':
-                            win_spart_edit.Close()
-                            win_spart_edit_active = False
-                            win_spart.UnHide()
-                            break
-                        elif ev_5 == 'Update':
-                            win_spart_edit.Close()      # close window spare part edit
-                            win_spart_edit_active = False   # set flag window spare part active = False
-                            # update spare part record
-                            svc_db.update_part_record(int(val_5['-PID-']), val_5['-SID-'], val_5['-SVCDATE-'], val_5['-PNAME-'], 
-                                                val_5['-QTY-'], val_5['-PRICE-'], val_5['-DISC-'], val_5['-AMT-'])
-                            # display popup message 
-                            sg.PopupAutoClose('Spare Part record updated successfully')
-                            # refresh spare part Table
-                            win_spart['-PTABLE-'].Update(val_3=svc_db.get_record_parts(svc_id))
-                            # show window spare part view
-                            win_spart.UnHide()
-                except Exception:
-                    e = sys.exc_info()[0]
-                    sg.PopupAutoClose("Error: %s" % e )            
-                    win_svc.UnHide()
+                # ------ Open the Spare Part Edit Window  ------
+                win_spart_edit = sg.Window('Edit Spare Parts', layout, size=(700,600), resizable=False).Finalize()
+                while True:
+                    ev_5, val_5 = win_spart_edit.Read()
+                    
+                    if ev_5 is None or ev_5 == 'Cancel':
+                        win_spart_edit.Close()
+                        win_spart_edit_active = False
+                        win_spart.UnHide()
+                        break
+
+                    # prevent user from entering invalid number
+                    elif not is_valid_number(([[val_5['-QTY-'], win_spart_edit['-QTY-']]])): continue
+
+                    # prevent user from entering invalid float
+                    elif not is_valid_float(([val_5['-PRICE-'], win_spart_edit['-PRICE-']], 
+                                             [val_5['-DISC-'], win_spart_edit['-DISC-']],
+                                             [val_5['-AMT-'], win_spart_edit['-AMT-']])): continue
+ 
+
+                    elif ev_5 == 'Update':
+                        # check for empty field
+                        if is_field_empty(([val_5['-PNAME-'], "Part Name"], [val_5['-QTY-'], "Quantity"], 
+                                            [val_5['-PRICE-'], "Price"], [val_5['-DISC-'], "Discount"], 
+                                            [val_5['-AMT-'], "Amount"])): continue
+
+                        win_spart_edit.Close()      # close window spare part edit
+                        win_spart_edit_active = False   # set flag window spare part active = False
+                        # update spare part record
+                        svc_db.update_part_record(int(val_5['-PID-']), val_5['-SID-'], val_5['-SVCDATE-'], val_5['-PNAME-'], 
+                                            val_5['-QTY-'], val_5['-PRICE-'], val_5['-DISC-'], val_5['-AMT-'])
+                        # display popup message 
+                        sg.PopupAutoClose('Spare Part record updated successfully')
+                        # refresh spare part Table
+                        win_spart['-PTABLE-'].Update(val_3=svc_db.get_record_parts(svc_id))
+                        # show window spare part view
+                        win_spart.UnHide()
+                # except Exception:
+                #     e = sys.exc_info()[0]
+                #     sg.PopupAutoClose("Error: %s" % e )            
+                #     win_svc.UnHide()
             elif ev_4 == "Add Part" and not win_spart_add_active:
                     win_spart.Hide()
                     win_spart_add_active = True
@@ -287,7 +302,24 @@ while True:
                             # show again window spare part view
                             win_spart.UnHide()
                             break
+
+                        # prevent user from entering invalid number
+                        elif not is_valid_number(([[val_6['-QTY-'], win_spart_add['-QTY-']]])): continue
+
+                        # prevent user from entering invalid float
+                        elif not is_valid_float(([val_6['-PRICE-'], win_spart_add['-PRICE-']], 
+                                                [val_6['-DISC-'], win_spart_add['-DISC-']],
+                                                [val_6['-AMT-'], win_spart_add['-AMT-']])): continue
+ 
+
                         elif ev_6 == 'Save':
+
+                            # check for empty field
+                            if is_field_empty(([val_6['-PNAME-'], "Part Name"], [val_6['-QTY-'], "Quantity"], 
+                                                [val_6['-PRICE-'], "Price"], [val_6['-DISC-'], "Discount"], 
+                                                [val_6['-AMT-'], "Amount"])): continue
+
+
                             win_spart_add.Close()      # close window spare part edit
                             win_spart_add_active = False   # set flag window spare part active = False
                             # save the new spare part record

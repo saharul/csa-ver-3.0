@@ -92,7 +92,6 @@ def service_layout_spart(sparts_rec, service_rec, carinfo, wkshpdb, val_1):
 
     return(layout)
 
-
 def spart_layout_edit(mode, spart_onerec, part_data):
 
     if mode == 'edit':
@@ -114,8 +113,8 @@ def spart_layout_edit(mode, spart_onerec, part_data):
                 [sg.Text('Service Date',font=('Consolas 11')), sg.Input(svc_date, key=('-SVCDATE-'), disabled=True, size=(30,1))],
                 [sg.Text('-' * 170)],
                 [sg.Text('Part Name', font=('Consolas 11')), sg.Combo(values=pdata, key=('-PNAME-'), default_value=part_name, pad=(28,0), size=(28,1))],
-                [sg.Text('Quantity', font=('Consolas 11')), sg.Input(qty, key=('-QTY-'), size=(30,1), pad=(35,0)), sg.Text('Price', font=('Consolas 11')), sg.Input(price, key=('-PRICE-'), size=(30,1))],
-                [sg.Text('Disc (RM)', font=('Consolas 11')), sg.Input(disc, size=(30,1), key=('-DISC-'), pad=(27,0)), sg.Text('Amount', font=('Consolas 11')), sg.Input(amount, key=('-AMT-'), size=(30,1), pad=(5,0))],
+                [sg.Text('Quantity', font=('Consolas 11')), sg.Input(qty, key=('-QTY-'), enable_events=True, size=(30,1), pad=(35,0)), sg.Text('Price', font=('Consolas 11')), sg.Input(price, enable_events=True, key=('-PRICE-'), size=(30,1))],
+                [sg.Text('Disc (RM)', font=('Consolas 11')), sg.Input(disc, size=(30,1), enable_events=True, key=('-DISC-'), pad=(27,0)), sg.Text('Amount', font=('Consolas 11')), sg.Input(amount, key=('-AMT-'), enable_events=True, size=(30,1), pad=(5,0))],
                 [sg.Text(' '*150)],
                 [sg.Button('Update', font=('Consolas 11')), sg.Button('Cancel')]]
     else:
@@ -128,8 +127,8 @@ def spart_layout_edit(mode, spart_onerec, part_data):
                         sg.Text('Date',font=('Consolas 11')), sg.Input(spart_onerec[0][2], disabled=True, key=('-SVCDATE-'), size=(30,1), pad=(25,0))],
                 [sg.Text('-' * 170)],
                 [sg.Text('Part Name', font=('Consolas 11')), sg.Combo(values=data, key=('-PNAME-'), default_value='', pad=(28,0), size=(50,1))],
-                [sg.Text('Quantity', font=('Consolas 11')), sg.Input('', key=('-QTY-'), size=(30,1), pad=(35,0)), sg.Text('Price', font=('Consolas 11')), sg.Input('', key=('-PRICE-'), size=(30,1))],
-                [sg.Text('Disc (RM)', font=('Consolas 11')), sg.Input('', size=(30,1), key=('-DISC-'), pad=(27,0)), sg.Text('Amount', font=('Consolas 11')), sg.Input('', key=('-AMT-'), size=(30,1), pad=(5,0))],
+                [sg.Text('Quantity', font=('Consolas 11')), sg.Input('', key=('-QTY-'), enable_events=True, size=(30,1), pad=(35,0)), sg.Text('Price', font=('Consolas 11')), sg.Input('', key=('-PRICE-'), enable_events=True, size=(30,1))],
+                [sg.Text('Disc (RM)', font=('Consolas 11')), sg.Input('', size=(30,1), enable_events=True, key=('-DISC-'), pad=(27,0)), sg.Text('Amount', font=('Consolas 11')), sg.Input('', key=('-AMT-'), enable_events=True, size=(30,1), pad=(5,0))],
                 [sg.Text(' '*150)],
                 [sg.Button('Save', font=('Consolas 11')), sg.Button('Cancel')]]
 
