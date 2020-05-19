@@ -3,3 +3,5 @@ __pycache__/
 csa-ver-3.0.ipynb
 *.bak
 data/
+venv
+.vscode

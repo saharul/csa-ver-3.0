@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-import PySimpleGUI as sg
-import pandas as pd
 import random
-import sys
 import string
-from service_db import ServiceDb
-from workshop_db import WorkshopDb
+import sys
+
+import pandas as pd
+import PySimpleGUI as sg
 from carinfo_db import CarInfoDb
-from layout import service_layout, service_layout_edit, service_layout_spart
-from layout import spart_layout_edit
-from validation import is_valid_number, is_field_empty, is_valid_float
+from layout import (service_layout, service_layout_edit, service_layout_spart,
+                    spart_layout_edit)
+from service_db import ServiceDb
+from validation import is_field_empty, is_valid_float, is_valid_number
+from workshop_db import WorkshopDb
 
 """
     Screen Car Service Management
@@ -358,4 +359,3 @@ while True:
                     win_spart['-PTABLE-'].Update(val_3=sparts_rec)
 
 win_svc.close()
-
