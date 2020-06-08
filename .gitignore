@@ -2,6 +2,13 @@ __pycache__/
 .ipynb_checkpoints/
 csa-ver-3.0.ipynb
 *.bak
-data/
 venv
 .vscode
+Pipfile
+Pipfile.lock
+carinfo_db.pyc
+max_id_file.py
+requirements.txt
+service_db.pyc
+service_db_1.py
+
