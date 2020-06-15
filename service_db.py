@@ -6,6 +6,9 @@ from Projects.csa_ver3.workshop_db import WorkshopDb
 from collections import namedtuple
 
 
+class ServiceError(Exception):
+        """ Exception class for Service """
+
 class ServiceDb(object):
     def __init__(
         self,
@@ -26,13 +29,13 @@ class ServiceDb(object):
                         continue
                 return int(line[0])
         except UnboundLocalError:  # file is empty
-            raise UnboundLocalError("File is empty")
+            raise ServiceError("File is empty")
         except FileNotFoundError:  # file does not exist
-            raise FileNotFoundError("File does not exist")
+            raise ServiceError("File does not exist")
         except ValueError:  # only header in the file
             return 0
 
-    # FUNCTION TO GET THE MAXIMUM SERVICE ID IN THE DB
+    # METHOD TO GET THE MAXIMUM SERVICE ID IN THE DB
     def get_max_part_id(self):
         try:
             with open(self.dbfilename_2, "r") as f:
@@ -43,14 +46,15 @@ class ServiceDb(object):
                         continue
                 return int(line[0])
         except UnboundLocalError:  # file is empty
-            raise UnboundLocalError("File is empty")
+            raise ServiceError("File is empty")
         except FileNotFoundError:  # file does not exist
-            raise FileNotFoundError("File does not exist")
+            raise ServiceError("File does not exist")
         except ValueError:  # only header in the file
             return 0
 
     # FUNCTION TO SAVE SERVICE TO FILE
     def save_record(self, new_record):
+        
         with open(self.dbfilename, "a+") as f:
             f.write(",".join(new_record))
 
@@ -119,12 +123,38 @@ class ServiceDb(object):
         )
         self.save_record(new_record)
 
-    # FUNCTION TO SAVE SPARE PART SERVICE TO FILE
+    # METHOD TO SAVE SPARE PART SERVICE TO FILE
     def save_part_record(self, new_record):
-        # f = open(self.dbfilename_2,"a+")
-        # f.write(new_record[0] + ',' + new_record[1] + ',' + new_record[2] + ',' +
-        #     new_record[3] + ',' + new_record[4] + ',' + new_record[5] + ',' + new_record[6] + ',' + new_record[7] + '\n')
-        # f.close()
+        # Open dataframe from csv_file
+        try:
+            df = pd.read_csv(self.dbfilename_2)
+            df_newrow = pd.DataFrame(
+                {
+                    "Id": [new_record[0]],
+                    "SvcId": [new_record[1]],
+                    "Date": [new_record[2]],
+                    "Name": [new_record[3].upper()],
+                    "Qty": [new_record[4]],
+                    "UnitPrice": ["{:.2f}".format(float(new_record[5]))],
+                    "Disc": ["{:.2f}".format(float(new_record[6]))],
+                    "Amount": ["{:.2f}".format(float(new_record[7]))],
+                }
+            )
+        except ValueError: 
+            raise ServiceError("Expected value float for Unit Price/Disc/Amount but was given string")
+        except FileNotFoundError:
+            raise ServiceError(f'Filepath "{self.dbfilename_2}" was not found')
+        except IndexError:
+            raise ServiceError("Invalid input value was given")
+        # # Append new row to dataframe
+        df = df.append(df_newrow, ignore_index=True, sort=False)
+        # sort the dataset
+        df.sort_values(["Id", "SvcId", "Name"])
+
+        # # Write back new dataframe to csv file
+        df.to_csv(self.dbfilename_2, index=False, header=True)
+        return(df)
+
 
         # Open dataframe from csv_file
         df = pd.read_csv(self.dbfilename_2)
@@ -141,15 +171,13 @@ class ServiceDb(object):
                 "Amount": ["{:.2f}".format(float(new_record[7]))],
             }
         )
-
         # # Append new row to dataframe
         df = df.append(df_newrow, ignore_index=True, sort=False)
-
         # sort the dataset
         df.sort_values(["Id", "SvcId", "Name"])
-
         # # Write back new dataframe to csv file
         df.to_csv(self.dbfilename_2, index=False, header=True)
+        return(df)
 
     def add_part_record(
         self,
@@ -374,12 +402,8 @@ class ServiceDb(object):
                 "amount",
             ]
         )
-        for i in range(1, len(df) + 1):
-            records.append(df.loc[i].values.tolist())  # df.to_numpy()
-        # for i, x in enumerate(records[:,7]):
-        #     records[i, 7] = "{:.2f}".format(x)
-        #     records[i, 6] = "{:.2f}".format(records[i,6])
-        # #records = df.to_numpy()
+        for i in range(0, len(df)):
+            records.append(df.loc[i].values.tolist())
         return records
 
     def list_all_records_old(self,):
@@ -440,7 +464,7 @@ class ServiceDb(object):
         df = pd.read_csv(self.dbfilename_2, index_col=False, header=0)
 
         records.append(["SvcId", "Date", "Name", "Qty", "UnitPrice", "Disc", "Amount"])
-        for i in range(1, len(df)):
+        for i in range(0, len(df)):
             records.append(df.loc[i].values.tolist())  # df.to_numpy()
         # for i, x in enumerate(records[:,7]):
         #     records[i, 7] = "{:.2f}".format(x)
@@ -462,9 +486,9 @@ class ServiceDb(object):
         df = pd.read_csv(self.dbfilename_2, index_col=False)
         # remove the row
         df1 = df[df.Id != int(part_id)]
-
         # write back the changes to file
         df1.to_csv(self.dbfilename_2, index=False, header=True)
+        return(df1)
 
     def show_parts(self):
         df = pd.read_csv(self.dbfilename_2)

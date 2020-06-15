@@ -8,6 +8,7 @@ from io import BytesIO
 from io import StringIO
 import os
 
+
 class TestServiceDb(unittest.TestCase):
     def test_get_max_id_only_header_exits(self):
         file_content_mock = """SvcId,SvcDate,Model,Plate,Workshop,Mileage,Nxt_Mileage,Nxt_Date,Labor,Amount"""
@@ -47,7 +48,6 @@ class TestServiceDb(unittest.TestCase):
         ) as _file:
             # test function return UnboundLocalError if file is empty
             self.assertRaises(UnboundLocalError, self.svcdb.get_max_part_id)
-
 
     def test_get_max_part_id(self):
         self.svcdb = svcdb(
@@ -314,6 +314,25 @@ class TestServiceDb(unittest.TestCase):
             _file().write.assert_any_call("""2,20/09/2018,EXORA 1.6 (A),AGU4004,CAR SPA SDN BHD,111783,116783,19/12/2018,0.00,429.35\n""")
             _file().write.assert_any_call("""3,18/04/2019,EXORA 1.6 (A),AGU4004,BENGKEL KERETA WAN,120715,125715,14/07/2019,0.00,60.00""")
             assert _file().write.call_count == 3
+
+
+    def test_get_record(self):
+        fake_file_path = "fake/file/path"
+        self.svcdb = svcdb(filename=fake_file_path)
+
+        file_content_mock = """SvcId,SvcDate,Model,Plate,Workshop,Mileage,Nxt_Mileage,Nxt_Date,Labor,Amount
+1,16/04/2019,EXORA 1.6 (A),AGU4004,CAR SPA SDN BHD,120715,125715,14/07/2019,0.00,466.60
+2,20/09/2018,EXORA 1.6 (A),AGU4004,CAR SPA SDN BHD,111783,116783,19/12/2018,0.00,429.35
+3,18/04/2019,EXORA 1.6 (A),AGU4004,BENGKEL KERETA WAN,120715,125715,14/07/2019,0.00,60.00"""
+
+        with patch('builtins.open', new=mock_open(read_data=file_content_mock)) as file:
+            line = self.svcdb.get_record("3")
+
+            # assert if opened file on write mode 'w'
+            file.assert_called_once_with(fake_file_path, 'r')
+
+            self.assertEqual(line[0], '3')
+            self.assertEqual(line[4], 'BENGKEL KERETA WAN')
 
 
 if __name__ == "__main__":
